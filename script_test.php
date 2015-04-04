@@ -23,8 +23,13 @@ if($post_button == "btnon1")
 	shell_exec('sudo python /home/pi/lightoff2.py');
 
 }elseif($post_button == "start_livevideo"){
-	echo "Starting Live Video"."<br>";
-	shell_exec('sudo raspivid -o - -t 0 -hf -w 800 -h 400 -fps 24| cvlc -vvv stream:///dev/stdin --sout \'#standard{access=http,mux=ts,dst=:8160}\':demux=h264')
 
+	echo "Starting Live Video"."<br>";
+	$result=shell_exec('/var/www/camloop.sh');
+	echo "<pre> $result </pre>";
+
+}elseif($post_button == "stop_livevideo"){
+	echo "Stopping Live Video"."<br>";
+	$result2=shell_exec('/var/www/camloop_stop.sh');
 }
 ?>
