@@ -65,6 +65,8 @@
 		$("#start_livevideo").click(function(){
                         event.preventDefault();
 			var button_id5 = $(this).attr("id");
+			var player = document.getElementById("vlc");
+//			player.playlist.play();
                         $.ajax({
                                 url: "script_test.php",
                                 type: "POST",
@@ -72,6 +74,7 @@
                                 success: function(ajaxresult){
                                         $("#ajaxrequest").html(ajaxresult);
                                         console.log('It worked5');
+					player.playlist.play();
                                 }
                         });
 	
@@ -80,8 +83,12 @@
 		$("#stop_livevideo").click(function(){
                         event.preventDefault();
                         var button_id6 = $(this).attr("id");
-                	$.ajax({
-                                url: "script_test.php",
+			var player = document.getElementById("vlc");
+                	player.playlist.stop();
+                        player.playlist.items.clear();
+
+			$.ajax({
+                                //url: "script_test.php",
                                 type: "POST",
                                 data:{id:button_id6},
                                 success: function(ajaxresult){
@@ -92,29 +99,53 @@
 
 		});
 
-		$("#angle").slider(function(){
-                        event.preventDefault();	
-                        var startPos = $("#angle").slider("value");
-                        var endPos = '';
-
-			$("#angle").on("slidestop",function(event,ui){
-				endPos= ui.value;
-
-				if(startPos != endPos){						
-					$.ajax({
-                                		url: "script_test.php",
-                                		type: "POST",
-                                		data:{id:button_id6},
-                                		success: function(ajaxresult){
-                                        		$("#ajaxrequest").html(ajaxresult);
-                                        		console.log('It worked6');
-                                		}
-                        		});
-				}
-			startPos = endPos;
-			});
+		$("#kill_raspivid").click(function(){
+                        event.preventDefault();
+                        var button_id7 = $(this).attr("id");
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id7},
+                                success: function(ajaxresult){
+                                        $("#ajaxrequest").html(ajaxresult);
+                                        console.log('It worked7');
+                                }
+                        });
 
                 });
+
+
+		$("#slider").on('change',function(){
+                        event.preventDefault();	
+			var slider_id = $(this).attr("id");
+			var degrees = $('#slider').val();
+			$("#slidervalueid").val($('#slider').val());
+			$.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:slider_id,angle:degrees},
+                                success: function(ajaxresult){
+                                        $("#ajaxrequest").html(ajaxresult);
+                                        //console.log("sliderid=",slider_id,"slider stop value=",degrees);
+                                }
+                        });
+		});
+
+		$("#activate_motiondetector").click(function(){
+                        event.preventDefault();
+                        var button_id8 = $(this).attr("id");
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id8},
+                                success: function(ajaxresult){
+                                        $("#ajaxrequest").html(ajaxresult);
+                                        console.log('It worked8');
+                                }
+                        });
+
+                });
+
 
 	});
 </script>
@@ -133,23 +164,24 @@
 
 <p id="Live Video Control"> --------Surveillance Camera--------</p>
 <button id="start_livevideo" align="left">  Start Live Video </button>
+
 <br></br>
 <button id="stop_livevideo" align="left">  Stop Live Video </button>
 <br></br>
 
+<button id="kill_raspivid" align="left"> Kill Live Feed </button>
+<br></br>
 <embed type="application/x-vlc-plugin" pluginspage="http://www.videolan.org" version="VideoLAN.VLCPlugin.2" width="600"
- height="400" id="vlc" loop="yes" autoplay="yes" target="http://169.254.64.100:8160/"</embed>
+ height="400" id="vlc" loop="no" autoplay="no" target="http://169.254.64.100:8160/"</embed>
 
 <br></br>
-<label for=camera_pan> Camera Pan Control</label>
-<input type=range min=0 max=180 value=0 step=10 ide=camera_pan oninput="outputUpdate(value)">
-<output for=camera_pan id=angle> 0 </output>
-<script>
-function outputUpdate(degrees){
-document.querySelector('#angle').value=degrees;
-}
-</script>
-
+<label for=slider> Camera Pan Control</label>
+<input type="range" id="slider" min="0" max="180" value="0" step="10">
+<input type="text" name="slidervalue" id="slidervalueid" class="text" value="0">
+<br></br>
+<p id="Motion Detector"> -------------Motion Detector----------------</p>
+<button id="activate_motiondetector" align="left"> Activate Motion Detector </button>
+<br></br>
 
 </body>
 </html>
