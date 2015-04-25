@@ -1,26 +1,38 @@
 #!/usr/bin/env python
 import picamera
 from time import sleep
+import time
 import subprocess
 import RPIO
-import time
 from RPIO import PWM
 import send_email
 import MySQLdb
 import datetime
+import signal
 
 def isr1(gpio_id,val):
 	print ("motion detected")
-	print ("gpio %s: %s" % (gpio_id,val))	
-	global flag1
-	flag1 = 1
-	print ("flag1 = %d" % flag1)
-	videorecord_withscan()
+	#videorecord_withscan()
 	send_email.send_email_alert()
 
-def videorecord_withscan():
-	global flag1
-	flag1 = 0
+	#def videorecord_withscan():
+	servername = "localhost"
+	username = "root"
+	password = "Ek5rpid6"
+	dbname = "light_status"
+
+	filename_prefix   = 'vid_'
+	table_name = 'recorded_video'
+	filepath   = '/var/www/videos/'
+	rawextension = '.h264'
+	dbextension  = '.mp4'
+
+	#Open Database connection
+	db = MySQLdb.connect(servername,username,password,dbname)
+
+	#prepare a cursor object using cursor() method
+	cursor = db.cursor()
+
 
 	pwm_pin = 18
 	print ("recording video now")
@@ -35,11 +47,14 @@ def videorecord_withscan():
         mp4name  = filepath + filename_prefix + datestring + dbextension
         table_filename = filename_prefix + datestring + dbextension
 
+	servo = PWM.Servo()
+	signal.signal(signal.SIGCHLD,signal.SIG_IGN)
+
 	camera=picamera.PiCamera() #instance of Picamera class
-	camera.start_recording(h264name);
+	camera.start_recording(h264name)
 	
 	#Clockwise rotation
-	for x in xrange(0,15):
+	for x in xrange(0,3):
         	print ("position %d" % (x))
         	pulse_duration = 900+80*x
         	print ("new pulse-width=%f" % (pulse_duration))
@@ -47,7 +62,7 @@ def videorecord_withscan():
         	time.sleep(1)  # wait for 1-seconds
 
 	#Counter Clockwise rotation
-	for xback in xrange(1,15):
+	for xback in xrange(1,3):
         	print ("position %d" % (xback))
         	pulse_duration = 2100-80*xback
         	print ("new pulse-width=%f" % (pulse_duration))
@@ -58,36 +73,14 @@ def videorecord_withscan():
 	servo.stop_servo(pwm_pin)
 
 	camera.stop_recording()
-        #subprocess.call('sudo MP4Box -add /var/www/videos/testclip2.h264 /var/www/videos/testclip2.mp4',shell=True)
-	subprocess.call("sudo MP4Box -add "+ h264name + " " + mp4name,shell=True)
-	
+        camera.close()
 	#insert filename into recorded_video mysql table
-	cursor.execute("""INSERT INTO recorded_video (date,time,viewedStatus,link) VALU$
+        cursor.execute("""INSERT INTO recorded_video (date,time,viewedStatus,link) VALUES (curdate(),curtime(),'unviewed',%s)""",table_filename)
 	db.commit()
 	db.close()
-
-	print ("recording stopped")
-	print ("Now flag1 = %d" % flag1)
+	subprocess.call("sudo MP4Box -add "+ h264name + " " + mp4name,shell=True)
 
 
-servername = "localhost"
-username = "root"
-password = "Ek5rpid6"
-dbname = "light_status"
-
-filename_prefix   = 'vid_'
-table_name = 'recorded_video'
-filepath   = '/var/www/videos/'
-rawextension = '.h264'
-dbextension  = '.mp4'
-
-#Open Database connection
-db = MySQLdb.connect(servername,username,password,dbname)
-
-#prepare a cursor object using cursor() method
-cursor = db.cursor()
-
-servo = PWM.Servo()
 
 photosensor_pin = 7 #GPIO 7, physical pin 26
 RPIO.setmode(RPIO.BCM)
@@ -98,10 +91,7 @@ RPIO.setup(photosensor_pin, RPIO.IN)
 #read input from gpio 7
 input_value = RPIO.input(photosensor_pin)
 
-print "photocell value= %d" % input_value
-
+#print "photocell value= %d" % input_value
 
 RPIO.add_interrupt_callback(photosensor_pin,isr1,edge='falling',pull_up_down=RPIO.PUD_UP,threaded_callback=False,debounce_timeout_ms=50)
-
-
 RPIO.wait_for_interrupts()
