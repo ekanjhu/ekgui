@@ -3,7 +3,7 @@
 <head>
 <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script> 
-
+<script type="test/javascript" src="/js/jquery.timers.js"></script>
 
 <script> 
 	var makeHTML = function (data_arr){
@@ -41,7 +41,7 @@
 			html2 += "<tr><td>" + data_arr2.entry + "</td><td>" +  data_arr2.date + "</td><td>" + data_arr2.time + "</td><td>" + data_arr2.viewedStatus + "</td><td><a id=\"" + data_arr2.link + "\"" + " href=\"#\">" + data_arr2.link + "</a></td></tr>";
 		});
 		//html2 = "<a id=\"click2\" href=\"#\"> click inside makeHtmlvideo </a>";
-		console.log(html2);
+		//console.log(html2);
                 return html2;
         }
 
@@ -52,12 +52,21 @@
                         data: {'video_table':videoFile},
                         success: function(data){
                                 $('#' + vidTable).html(makeHTMLvideo(data));
-                                //console.log(data);
                         }
                 });
         }
 
-
+	//Refreshes recorded video table every 30-seconds
+	setInterval(function(){
+		$.ajax({ 
+			url: "server",
+			success: function(){
+				buildTable_video('inputvideo','recorded_video_table');
+				console.log('loop worked');
+			}
+		});
+	},30000);
+	
 	$(document).ready(function(){
 		buildTable('room1','room1_table');
 		buildTable('room2','room2_table');
@@ -204,12 +213,31 @@
                                 type: "POST",
                                 data:{id:button_id8},
                                 success: function(ajaxresult){
-                                        $("#ajaxrequest").html(ajaxresult);
+                                        //$("#ajaxrequest").html(ajaxresult);
                                         //console.log('It worked8');
+					//buildTable_video('inputvideo','recorded_video_table');
+                                	$("#motion_detector_status").html("<p>Motion Detector On</p>")
+				}
+                        });
+
+                });
+
+		$("#deactivate_motiondetector").click(function(){
+                        event.preventDefault();
+                        var button_id8 = $(this).attr("id");
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id8},
+                                success: function(ajaxresult){
+                                        //$("#ajaxrequest").html(ajaxresult);
+                                        //console.log('It worked8');
+                                        //buildTable_video('inputvideo','recorded_video_table');
                                 }
                         });
 
                 });
+
 		
 		$("table").click(function(){
                         
@@ -222,7 +250,7 @@
 			$('#'+videoID).get(0).pause();
 			$('#'+sourceID).attr('src',newmp4);
 			$('#'+videoID).get(0).load();
-			$('#'+videoID).get(0).play();
+			//$('#'+videoID).get(0).play();
 			$.ajax({
                                 url: "script_test.php",
                                 type: "POST",
@@ -261,8 +289,8 @@
 
 <p id="record_video_table_label">--------Recorded Video-------------</p>
 <table id="recorded_video_table" border="1" cellspacing="2" cellpadding="2"></table>
-
-<video id="videoclip"  width = "200" controls="controls" autoplay="false">
+<br></br>
+<video id="videoclip"  width = "400" height="300" controls="controls" autoplay="false">
 <!--<source src="videos/testclip2.mp4" type="video/mp4">-->
 <source id = "mp4video" src="#" type="video/mp4" />
 </video>
@@ -289,8 +317,11 @@
 <br></br>
 <p id="Motion Detector"> -------------Motion Detector----------------</p>
 <button id="activate_motiondetector" align="left"> Activate Motion Detector </button>
+<br> 
+<div id="motion_detector_status"></div>
+</br>
+<button id="deactivate_motiondetector" align="left"> Deactivate Motion Detector </button>
 <br></br>
-
 <?php
 $servername = "localhost";
 $username = "root";
