@@ -84,6 +84,8 @@ if($post_button == "btnon1"){
 }elseif($post_button == "activate_motiondetector"){
 	echo "turn on motion detector"."<br>";
 	shell_exec('sudo python /home/pi/pir_capture_video_scan.py');
+}elseif($post_button == "deactivate_motiondetector"){
+	shell_exec('sudo pkill -f "pir_capture_video_scan.py"');
 }elseif($get_roomTable == "room1"){
 	//$selected = mysql_select_db($dbname,$dbhandle) or die ("Unable to select database<br>");
 	select_database($dbname,$dbhandle);
