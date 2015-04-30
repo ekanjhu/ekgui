@@ -35,7 +35,8 @@
 
 	var makeHTMLvideo = function (data_arr){
                 //Make table
-                var html2= "";
+                console.log(data_arr);
+		var html2= "";
                 html2 += "<tr><th>Entry</th><th>Date</th><th>Time</th><th>Viewed Status</th><th>Video Link</th></tr>";
                 data_arr.results.forEach(function(data_arr2){
 			html2 += "<tr><td>" + data_arr2.entry + "</td><td>" +  data_arr2.date + "</td><td>" + data_arr2.time + "</td><td>" + data_arr2.viewedStatus + "</td><td><a id=\"" + data_arr2.link + "\"" + " href=\"#\">" + data_arr2.link + "</a></td></tr>";
@@ -62,15 +63,19 @@
 			url: "server",
 			success: function(){
 				buildTable_video('inputvideo','recorded_video_table');
+				buildTable('room1','room1_table');
+	                	buildTable('room2','room2_table');
 				console.log('loop worked');
 			}
 		});
 	},30000);
+
 	
 	$(document).ready(function(){
 		buildTable('room1','room1_table');
 		buildTable('room2','room2_table');
 		buildTable_video('inputvideo','recorded_video_table');
+		
 		$("#btnon1").click(function(){
 			event.preventDefault();
 			var button_id = $(this).attr("id");
@@ -80,7 +85,7 @@
 				data:{id:button_id},
 				dataType: "json",
 				success: function(data1){
-					//$("#ajaxrequest").html(ajaxresult.id);
+					//$("#ajaxrequest").html(data1);
 					//var rLength = ajaxresult.results.length;
 					//var phparray = ajaxresult.results
 					console.log(data1);
@@ -104,6 +109,80 @@
 				}
                         });
                 });
+
+		 $("#timer1").click(function(){
+                        event.preventDefault();
+                        var button_id2 = $(this).attr("id");
+			var formData ={	
+				'ontime' : $('input[name=onTime1]').val(),
+				'offtime': $('input[name=offTime1]').val()
+			};
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id2,formData1:formData},
+                                success: function(data1){
+                                        //$("#ajaxrequest").html(ajaxresult);
+                                        console.log(data1);
+                                }
+                        });
+                });
+
+		    $("#timer2").click(function(){
+                        event.preventDefault();
+                        var button_id2 = $(this).attr("id");
+                        var formData ={ 
+                                'ontime' : $('input[name=onTime2]').val(),
+                                'offtime': $('input[name=offTime2]').val()
+                        };
+                        console.log(button_id2,formData);
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id2,formData1:formData},
+                                success: function(data1){
+                                        //$("#ajaxrequest").html(ajaxresult);
+                                        console.log(data1);
+                                }
+                        });
+                });
+
+
+
+
+		 $("#cancel_timer").click(function(){
+                        event.preventDefault();
+                        var button_id3 = $(this).attr("id");
+                        //$('input').val('');
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id3},
+                                success: function(){
+                                        //$("#ajaxrequest").html(ajaxresult);
+                                        console.log('timer reset');
+                                }
+                        });
+                });
+
+		  $("#cancel_timer2").click(function(){
+                        event.preventDefault();
+                        var button_id3 = $(this).attr("id");
+                        //$('input').val('');
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id3},
+                                success: function(){
+                                        //$("#ajaxrequest").html(ajaxresult);
+                                        console.log('timer reset');
+                                }
+                        });
+                });
+
+
+
+
 
 		 $("#btnon2").click(function(){
                         event.preventDefault();
@@ -140,7 +219,7 @@
                         event.preventDefault();
 			var button_id5 = $(this).attr("id");
 			var player = document.getElementById("vlc");
-//			player.playlist.play();
+			//player.playlist.play();
                         $.ajax({
                                 url: "script_test.php",
                                 type: "POST",
@@ -153,6 +232,25 @@
                         });
 	
                 });
+
+		 $("#start_livevideo_record").click(function(){
+                        event.preventDefault();
+                        var button_id5 = $(this).attr("id");
+                        var player = document.getElementById("vlc");
+                        //player.playlist.play();
+                        $.ajax({
+                                url: "script_test.php",
+                                type: "POST",
+                                data:{id:button_id5},
+                                success: function(ajaxresult){
+                                        $("#ajaxrequest").html(ajaxresult);
+                                        console.log(ajaxresult);
+                                        //player.playlist.play();
+                                }
+                        });
+        
+                });
+
 
 		$("#stop_livevideo").click(function(){
                         event.preventDefault();
@@ -215,7 +313,7 @@
                                 success: function(ajaxresult){
                                         //$("#ajaxrequest").html(ajaxresult);
                                         //console.log('It worked8');
-					//buildTable_video('inputvideo','recorded_video_table');
+					buildTable_video('inputvideo','recorded_video_table');
                                 	$("#motion_detector_status").html("<p>Motion Detector On</p>")
 				}
                         });
@@ -244,19 +342,25 @@
 			event.preventDefault();
 			//var test1 = $(this).find('tr').find('td').find('a').attr("id");
 			var test1 = event.target.id;
-                       	var videoID = 'videoclip';
-			var sourceID= 'mp4video';
-			var newmp4 = "videos/"+test1;
-			$('#'+videoID).get(0).pause();
-			$('#'+sourceID).attr('src',newmp4);
-			$('#'+videoID).get(0).load();
+                       	//var videoID = 'videoclip';
+			//var sourceID= 'mp4video';
+			//var newmp4 = "videos/"+test1;
+			//$('#'+videoID).get(0).pause();
+			//$('#'+sourceID).attr('src',newmp4);
+			//$('#'+videoID).get(0).load();
 			//$('#'+videoID).get(0).play();
 			$.ajax({
                                 url: "script_test.php",
                                 type: "POST",
                                 data:{change_status:true,filename:test1},
                                 success: function(newtable){
-                                        console.log(newtable);
+					var videoID = 'videoclip';
+                        		var sourceID= 'mp4video';
+                        		var newmp4 = "videos/"+newtable.newfile;
+					console.log(newtable,newmp4);
+                        		$('#'+videoID).get(0).pause();
+                        		$('#'+sourceID).attr('src',newmp4);
+                        		$('#'+videoID).get(0).load();
 					buildTable_video('inputvideo','recorded_video_table');
                                 	
 				}
@@ -279,6 +383,13 @@
 <table id="room1_table" border="1" cellspacing="2" cellpadding="2"></table>
 <br></br>
 
+<form id="timer1">
+Time On: <input type="time" name="onTime1"/>
+Time Off: <input type="time" name="offTime1"/>
+</form>
+<button type="submit" id="set_timer"> Program Timer </button>
+<button id="cancel_timer">Cancel Timer</button>
+
 <p id="LightControl2">-------- Room 2--------</p>
 <button id="btnon2"> Turn Light On </button>
 <br></br>
@@ -286,6 +397,16 @@
 <br></br>
 <table id="room2_table" border="1" cellspacing="2" cellpadding="2"></table>
 <br></br>
+
+<form id="timer2">
+Time On: <input type="time" name="onTime2"/>
+Time Off: <input type="time" name="offTime2"/>
+</form>
+<button id="set_timer2"> Program Timer </button>
+<button id="cancel_timer2">Cancel Timer</button>
+
+
+
 
 <p id="record_video_table_label">--------Recorded Video-------------</p>
 <table id="recorded_video_table" border="1" cellspacing="2" cellpadding="2"></table>
@@ -300,12 +421,13 @@
 <br></br>
 <p id="Live Video Control"> --------Surveillance Camera--------</p>
 <button id="start_livevideo" align="left">  Start Live Video </button>
-
+<button id="start_livevideo_record"> Start Live Video and Record</button>
 <br></br>
 <button id="stop_livevideo" align="left">  Stop Live Video </button>
 <br></br>
 
 <button id="kill_raspivid" align="left"> Kill Live Feed </button>
+<button id="kill_raspivid_record">Kill Live Feed and Recording</button>
 <br></br>
 <embed type="application/x-vlc-plugin" pluginspage="http://www.videolan.org" version="VideoLAN.VLCPlugin.2" width="600"
  height="400" id="vlc" loop="no" autoplay="no" target="http://169.254.64.100:8160/"</embed>

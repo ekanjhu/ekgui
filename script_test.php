@@ -35,6 +35,7 @@ $get_roomTable=$_REQUEST["room"];
 $get_videoFile=$_REQUEST["video_table"];
 $get_viewVideo=$_POST["change_status"];
 $video_filename=$_POST["filename"];
+$timer_data=$_POST["formData1"];
 
 if($post_button == "btnon1"){
 	shell_exec('sudo python /home/pi/lighton.py');
@@ -53,6 +54,20 @@ if($post_button == "btnon1"){
         $new_state = "off";
 	$last_state = select_LastLightState($colname,$tableName,$new_state);
 	echo json_encode($last_state);
+}elseif($post_button=="timer1"){
+	$ontimeval=$timer_data{'ontime'};
+	$offtimeval=$timer_data{'offtime'};
+	shell_exec('sudo python /home/pi/time_lights.py '.$ontimeval.' '.$offtimeval);
+	echo json_encode($offtimeval);
+}elseif($post_button=="timer2"){
+	$ontimeval=$timer_data{'ontime'};
+        $offtimeval=$timer_data{'offtime'};
+        shell_exec('sudo python /home/pi/time_lights2.py '.$ontimeval.' '.$offtimeval);
+        echo json_encode($offtimeval);
+}elseif($post_button=="cancel_timer"){
+	shell_exec('sudo pkill -f time_lights.py');
+}elseif($post_button=="cancel_timer2"){
+	shell_exec('sudo pkill -f time_lights2.py');
 }elseif($post_button == "btnon2"){
 	shell_exec('sudo python /home/pi/lighton2.py');
 	select_database($dbname,$dbhandle);
@@ -74,6 +89,12 @@ if($post_button == "btnon1"){
 	echo "Starting Live Video"."<br>";
 	$result=shell_exec('/var/www/camloop.sh');
 	echo "<pre> $result </pre>";
+}elseif($post_button=="start_livevideo_record"){
+	$result=shell_exec('/var/www/camloop_record.sh');
+	echo json_encode("<pre>$result</pre>");
+	//$result=escapeshellarg($result);
+	//$result2=shell_exec("/var/www/test1.sh $result");
+	//echo json_encode("$result");
 }elseif($post_button == "kill_raspivid"){
 	echo "Stopping Raspivid"."<br>";
 	$result2=shell_exec('/var/www/camloop_stop.sh');
@@ -122,7 +143,7 @@ if($post_button == "btnon1"){
 	$arrvar = array("results"=>$rows);
 	echo json_encode($arrvar);
 }elseif($get_viewVideo == "true"){
-        select_database($dbname,$dbhandle);
+	select_database($dbname,$dbhandle);
         $query  = "UPDATE recorded_video SET viewedStatus='viewed' WHERE link='$video_filename'";
         $result = mysql_query($query);
         $query2 = "SELECT * FROM recorded_video";
@@ -132,7 +153,17 @@ if($post_button == "btnon1"){
                 $rows[]=$r;
         }
         mysql_close();
-        $arrvar = array("results"=>$rows);
+	
+	//Check if this is h264 file, if it is, then convert before updating
+        $filetype=stristr($video_filename,"h264");
+        if($filetype =="h264"){
+                $newfile_name=str_replace("h264","mp4",$filetype);
+                shell_exec('sudo MP4Box -add $video_filename $newfile_name');   	
+	}else{
+		$newfile_name=$video_filename;
+	}
+
+        $arrvar = array("results"=>$rows,"newfile"=>$newfile_name);
         echo json_encode($arrvar);
 }
 
