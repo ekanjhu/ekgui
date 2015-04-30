@@ -51,10 +51,11 @@ def isr1(gpio_id,val):
 	signal.signal(signal.SIGCHLD,signal.SIG_IGN)
 
 	camera=picamera.PiCamera() #instance of Picamera class
+	camera.vflip=True
 	camera.start_recording(h264name)
 	
 	#Clockwise rotation
-	for x in xrange(0,3):
+	for x in xrange(0,15):
         	print ("position %d" % (x))
         	pulse_duration = 900+80*x
         	print ("new pulse-width=%f" % (pulse_duration))
@@ -62,7 +63,7 @@ def isr1(gpio_id,val):
         	time.sleep(1)  # wait for 1-seconds
 
 	#Counter Clockwise rotation
-	for xback in xrange(1,3):
+	for xback in xrange(1,15):
         	print ("position %d" % (xback))
         	pulse_duration = 2100-80*xback
         	print ("new pulse-width=%f" % (pulse_duration))
