@@ -104,6 +104,7 @@ if($post_button == "btnon1"){
 	shell_exec('sudo python /home/pi/servo_slidercontrol.py '.$post_value);
 }elseif($post_button == "activate_motiondetector"){
 	echo "turn on motion detector"."<br>";
+	echo json_encode("Motion Detector Activated");
 	shell_exec('sudo python /home/pi/pir_capture_video_scan.py');
 }elseif($post_button == "deactivate_motiondetector"){
 	shell_exec('sudo pkill -f "pir_capture_video_scan.py"');

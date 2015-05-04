@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script> 
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script> 
 <script type="test/javascript" src="/js/jquery.timers.js"></script>
 
 <script> 
@@ -110,8 +110,9 @@
                         });
                 });
 
-		 $("#timer1").click(function(){
+		 $("#timer1").submit(function(){
                         event.preventDefault();
+			$("#timer1_state").html("Timer1 Set");
                         var button_id2 = $(this).attr("id");
 			var formData ={	
 				'ontime' : $('input[name=onTime1]').val(),
@@ -122,15 +123,15 @@
                                 type: "POST",
                                 data:{id:button_id2,formData1:formData},
                                 success: function(data1){
-                                        //$("#ajaxrequest").html(ajaxresult);
                                         console.log(data1);
                                 }
                         });
                 });
 
-		    $("#timer2").click(function(){
+		    $("#timer2").submit(function(){
                         event.preventDefault();
-                        var button_id2 = $(this).attr("id");
+                        $("#timer2_state").html("Timer2 Set");
+			var button_id2 = $(this).attr("id");
                         var formData ={ 
                                 'ontime' : $('input[name=onTime2]').val(),
                                 'offtime': $('input[name=offTime2]').val()
@@ -159,7 +160,7 @@
                                 type: "POST",
                                 data:{id:button_id3},
                                 success: function(){
-                                        //$("#ajaxrequest").html(ajaxresult);
+                                        $("#timer1_state").html("Timer1 Off");
                                         console.log('timer reset');
                                 }
                         });
@@ -174,7 +175,7 @@
                                 type: "POST",
                                 data:{id:button_id3},
                                 success: function(){
-                                        //$("#ajaxrequest").html(ajaxresult);
+                                        $("#timer2_state").html("Timer2 Off");
                                         console.log('timer reset');
                                 }
                         });
@@ -208,7 +209,7 @@
                                 type: "POST",
                                 data:{id:button_id4},
                                 success: function(ajaxresult){
-                                        $("#ajaxrequest").html(ajaxresult);
+                                        //$("#ajaxrequest").html(ajaxresult);
                                         //console.log('It worked4');
 					buildTable('room2','room2_table');
                                 }
@@ -225,7 +226,7 @@
                                 type: "POST",
                                 data:{id:button_id5},
                                 success: function(ajaxresult){
-                                        $("#ajaxrequest").html(ajaxresult);
+                                        //$("#ajaxrequest").html(ajaxresult);
                                         console.log('It worked5');
 					player.playlist.play();
                                 }
@@ -243,7 +244,7 @@
                                 type: "POST",
                                 data:{id:button_id5},
                                 success: function(ajaxresult){
-                                        $("#ajaxrequest").html(ajaxresult);
+                                        //$("#ajaxrequest").html(ajaxresult);
                                         console.log(ajaxresult);
                                         //player.playlist.play();
                                 }
@@ -264,7 +265,7 @@
                                 type: "POST",
                                 data:{id:button_id6},
                                 success: function(ajaxresult){
-                                        $("#ajaxrequest").html(ajaxresult);
+                                        //$("#ajaxrequest").html(ajaxresult);
                                         console.log('It worked6');
                                 }
                         });
@@ -279,7 +280,7 @@
                                 type: "POST",
                                 data:{id:button_id7},
                                 success: function(ajaxresult){
-                                        $("#ajaxrequest").html(ajaxresult);
+                                        //$("#ajaxrequest").html(ajaxresult);
                                         console.log('It worked7');
                                 }
                         });
@@ -297,7 +298,7 @@
                                 type: "POST",
                                 data:{id:slider_id,angle:degrees},
                                 success: function(ajaxresult){
-                                        $("#ajaxrequest").html(ajaxresult);
+                                        //$("#ajaxrequest").html(ajaxresult);
                                         //console.log("sliderid=",slider_id,"slider stop value=",degrees);
 				}
                         });
@@ -306,15 +307,16 @@
 		$("#activate_motiondetector").click(function(){
                         event.preventDefault();
                         var button_id8 = $(this).attr("id");
+			$("#activate_state").html("Motion Detector Activated");
                         $.ajax({
                                 url: "script_test.php",
                                 type: "POST",
                                 data:{id:button_id8},
                                 success: function(ajaxresult){
-                                        //$("#ajaxrequest").html(ajaxresult);
+                                        $("#activate_state").html(ajaxresult);
                                         //console.log('It worked8');
 					buildTable_video('inputvideo','recorded_video_table');
-                                	$("#motion_detector_status").html("<p>Motion Detector On</p>")
+                                	//$("#motion_detector_status").html("<p>Motion Detector On</p>")
 				}
                         });
 
@@ -328,7 +330,7 @@
                                 type: "POST",
                                 data:{id:button_id8},
                                 success: function(ajaxresult){
-                                        //$("#ajaxrequest").html(ajaxresult);
+                                        $("#activate_state").html("Motion Detector Deactivated");
                                         //console.log('It worked8');
                                         //buildTable_video('inputvideo','recorded_video_table');
                                 }
@@ -386,9 +388,11 @@
 <form id="timer1">
 Time On: <input type="time" name="onTime1"/>
 Time Off: <input type="time" name="offTime1"/>
-</form>
 <button type="submit" id="set_timer"> Program Timer </button>
+</form>
+<!--button type="submit" id="set_timer"> Program Timer </button-->
 <button id="cancel_timer">Cancel Timer</button>
+<div id="timer1_state"></div>
 
 <p id="LightControl2">-------- Room 2--------</p>
 <button id="btnon2"> Turn Light On </button>
@@ -401,10 +405,11 @@ Time Off: <input type="time" name="offTime1"/>
 <form id="timer2">
 Time On: <input type="time" name="onTime2"/>
 Time Off: <input type="time" name="offTime2"/>
+<button type="submit" id="set_timer2"> Program Timer </button>
 </form>
-<button id="set_timer2"> Program Timer </button>
+<!--button id="set_timer2"> Program Timer </button-->
 <button id="cancel_timer2">Cancel Timer</button>
-
+<div id="timer2_state"></div>
 
 
 
@@ -421,13 +426,13 @@ Time Off: <input type="time" name="offTime2"/>
 <br></br>
 <p id="Live Video Control"> --------Surveillance Camera--------</p>
 <button id="start_livevideo" align="left">  Start Live Video </button>
-<button id="start_livevideo_record"> Start Live Video and Record</button>
+<!--button id="start_livevideo_record"> Start Live Video and Record</button-->
 <br></br>
 <button id="stop_livevideo" align="left">  Stop Live Video </button>
 <br></br>
 
 <button id="kill_raspivid" align="left"> Kill Live Feed </button>
-<button id="kill_raspivid_record">Kill Live Feed and Recording</button>
+<!--button id="kill_raspivid_record">Kill Live Feed and Recording</button-->
 <br></br>
 <embed type="application/x-vlc-plugin" pluginspage="http://www.videolan.org" version="VideoLAN.VLCPlugin.2" width="600"
  height="400" id="vlc" loop="no" autoplay="no" target="http://169.254.64.100:8160/"</embed>
@@ -444,6 +449,7 @@ Time Off: <input type="time" name="offTime2"/>
 </br>
 <button id="deactivate_motiondetector" align="left"> Deactivate Motion Detector </button>
 <br></br>
+<div id="activate_state"></div>
 <?php
 $servername = "localhost";
 $username = "root";
